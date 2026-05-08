@@ -1,2 +1,5 @@
 # datasets
 /data
+
+# cache
+__pycache__
