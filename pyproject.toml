@@ -10,6 +10,8 @@ dependencies = [
     "accelerate>=0.26.0",
     "librosa>=0.11.0",
     "soundfile>=0.13.1",
+    "tqdm>=4.66.5",
+    "pandas>=3.0.2",
 ]
 
 # development only dependencies notebooks and etc...
