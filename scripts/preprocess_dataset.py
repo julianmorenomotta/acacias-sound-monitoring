@@ -43,7 +43,7 @@ def get_event_roll(
 
 
 def main():
-    raw_ds_path = Path("..data/raw/URBAN-SED_v2.0.0")
+    raw_ds_path = Path("../data/raw/URBAN-SED_v2.0.0")
     processed_ds_path = Path("../data/processed/URBAN-SED_v2.0.0")
 
     extractor = MelSpectrogramExtractor()
@@ -52,7 +52,7 @@ def main():
     folds = ["train", "validate", "test"]
 
     for fold in folds:
-        print(f"Processing fold; {fold}")
+        print(f"Processing fold: {fold}")
         audio_dir = raw_ds_path / "audio" / fold
         annot_dir = raw_ds_path / "annotations" / fold
         out_feature_dir = processed_ds_path / "features" / fold
@@ -63,11 +63,14 @@ def main():
 
         audio_files = list(audio_dir.glob("*.wav"))
         for audio_path in tqdm(audio_files):
+            if audio_path.name.startswith("."):
+                continue
+
             # extract features
             features = extractor.extract(audio_path)
 
             # extract labels
-            label_path = annot_dir / (audio_path.stem + "*.txt")
+            label_path = annot_dir / (audio_path.stem + ".txt")
             labels = get_event_roll(
                 label_path,
                 features.shape[0],
@@ -87,10 +90,10 @@ def main():
                 if batch_max > scaler.max_val:
                     scaler.max_val = batch_max
 
-        scaler_path = processed_ds_path / "scaler.pt"
-        scaler.save(scaler_path)
+    scaler_path = processed_ds_path / "scaler.pt"
+    scaler.save(scaler_path)
 
-        print(f"Preprocessing complete. Scaler saved to {scaler_path}")
+    print(f"Preprocessing complete. Scaler saved to {scaler_path}")
 
 
 if __name__ == "__main__":
