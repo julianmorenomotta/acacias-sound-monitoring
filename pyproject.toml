@@ -12,6 +12,7 @@ dependencies = [
     "soundfile>=0.13.1",
     "tqdm>=4.66.5",
     "pandas>=3.0.2",
+    "wandb>=0.26.1",
 ]
 
 # development only dependencies notebooks and etc...
