@@ -3,3 +3,12 @@
 
 # cache
 __pycache__
+
+# wandb
+/wandb
+
+# logs
+*.log
+
+# models
+/models

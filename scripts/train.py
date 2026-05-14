@@ -15,12 +15,12 @@ from sbcnn_sed.data.scaler import MinMaxScaler
 from sbcnn_sed.model.models import SBCNNSed
 
 PROCESSED_DATA_PATH = Path("data/processed/URBAN-SED_v2.0.0")
-MODEL_SAVE_PATH = Path("model/checkpoints/best_sed_model.pth")
+MODEL_SAVE_PATH = Path("models/checkpoints/best_sed_model.pth")
 MODEL_SAVE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 BATCH_SIZE = 32
 LEARNING_RATE = 1e-4
-EPOCHS = 50
+EPOCHS = 1
 PATIENCE = 10
 NUM_WORKERS = 4
 
@@ -33,6 +33,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 wandb.init(
+    entity="julianmrn5-brl-media",
     project="acacias-sound-monitor",
     config={
         "learning_rate": LEARNING_RATE,
@@ -82,9 +83,13 @@ for epoch in range(EPOCHS):
     model.train()
     train_loss = 0.0
 
-    train_loop = tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Train]")
+    train_loop = tqdm.tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Train]")
     for features, labels in train_loop:
         features, labels = features.to(device), labels.to(device)
+
+        batch_size, num_sequences, height, width = features.shape
+        features = features.view(batch_size * num_sequences, 1, height, width)
+        labels = labels.view(batch_size * num_sequences, -1)
 
         optimizer.zero_grad()
         outputs = model(features)
@@ -102,10 +107,15 @@ for epoch in range(EPOCHS):
     model.eval()
     val_loss = 0.0
 
-    val_loop = tqdm(val_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Validation]")
+    val_loop = tqdm.tqdm(val_loader, desc=f"Epoch {epoch+1}/{EPOCHS} [Validation]")
     with torch.no_grad():
         for features, labels in val_loop:
             features, labels = features.to(device), labels.to(device)
+
+            batch_size, num_sequences, height, width = features.shape
+            features = features.view(batch_size * num_sequences, 1, height, width)
+            labels = labels.view(batch_size * num_sequences, -1)
+
             outputs = model(features)
             loss = criterion(outputs, labels)
             val_loss += loss.item()
