@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import logging
 import wandb
+import argparse
 import tqdm as tqdm
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
@@ -20,9 +21,18 @@ MODEL_SAVE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 BATCH_SIZE = 32
 LEARNING_RATE = 1e-4
-EPOCHS = 1
-PATIENCE = 10
+EPOCHS = 500
+PATIENCE = 30
 NUM_WORKERS = 4
+
+parser = argparse.ArgumentParser(description="Train SBCNNSed model")
+parser.add_argument(
+    "--resume",
+    action="store_true",
+    help="Flag to resume training from best model checkpoint",
+)
+
+args = parser.parse_args()
 
 logging.basicConfig(
     filename="train.log",
@@ -72,14 +82,30 @@ model = SBCNNSed(num_classes=10).to(device)
 criterion = nn.BCEWithLogitsLoss()
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
+start_epoch = 0
+RESUME_PATH = MODEL_SAVE_PATH
+best_val_loss = float("inf")
+
+if args.resume and RESUME_PATH.exists():
+    print(f"Loading checkpoint from {RESUME_PATH}")
+    logger.info(f"resuming training from {RESUME_PATH}")
+
+    checkpoint = torch.load(RESUME_PATH, map_location=device)
+
+    model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    start_epoch = checkpoint["epoch"] + 1
+
+    if "best_val_loss" in checkpoint:
+        best_val_loss = checkpoint["best_val_loss"]
+
 wandb.watch(model, log_freq=10)
 logger.info(f"starting training on device: {device}")
 
 # main training loop
-best_val_loss = float("inf")
 epochs_without_improvement = 0
 
-for epoch in range(EPOCHS):
+for epoch in range(start_epoch, EPOCHS):
     model.train()
     train_loss = 0.0
 

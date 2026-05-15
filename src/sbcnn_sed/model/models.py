@@ -45,7 +45,7 @@ class SBCNNSed(nn.Module):
             nn.ReLU(),
             nn.Dropout(p=0.5),
             nn.Linear(in_features=64, out_features=num_classes),
-            nn.Sigmoid(),
+            # nn.Sigmoid(),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -62,3 +62,7 @@ class SBCNNSed(nn.Module):
         out = self.classifier(x)
 
         return out
+
+    def predict(self, x: torch.Tensor) -> torch.Tensor:
+        logits = self.forward(x)
+        return torch.sigmoid(logits)

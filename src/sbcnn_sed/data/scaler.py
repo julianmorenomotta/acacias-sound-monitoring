@@ -1,4 +1,5 @@
 import torch
+from pathlib import Path
 import logging
 
 logger = logging.getLogger(__name__)
@@ -60,7 +61,7 @@ class MinMaxScaler:
 
         return (self.max_val - self.min_val) * (X_scaled / 2.0 + 5.0) + self.min_val
 
-    def save(self, filepath: str):
+    def save(self, filepath: str | Path):
         """
         Saves scaler state (min and max values) to file
         """
@@ -69,7 +70,7 @@ class MinMaxScaler:
         torch.save(state, filepath)
         logger.info(f"Scaler state saved to {filepath}")
 
-    def load(self, filepath: str):
+    def load(self, filepath: str | Path):
         """
         loads the scaler's state from a file
         """
