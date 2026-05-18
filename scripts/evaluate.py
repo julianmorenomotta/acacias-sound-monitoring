@@ -10,7 +10,7 @@ from datetime import datetime
 # Ensure src is in the path
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-from sbcnn_sed.data.dataset import UrbanSedDataset
+from sbcnn_sed.data.dataset import UrbanSedDataset, URBAN_SED_CLASSES
 from sbcnn_sed.data.scaler import MinMaxScaler
 from sbcnn_sed.model.models import SBCNNSed
 
@@ -19,11 +19,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger("evaluate")
 
-PROCESSED_DATA_PATH = Path("data/processed/URBAN-SEDv2.0.0")
-CHECKPOINT_PATH = Path("model/checkpoints/best_sed_model.pth")
+PROCESSED_DATA_PATH = Path("data/processed/URBAN-SED_v2.0.0")
+CHECKPOINT_PATH = Path("models/checkpoints/best_sed_model.pth")
 BATCH_SIZE = 32
 NUM_WORKERS = 4
-THRESHOLD = 0.5
+THRESHOLD = 0.3
 
 device = torch.device(
     "cuda"
@@ -36,7 +36,7 @@ logger.info(f"Using device: {device}")
 
 def main():
     scaler = MinMaxScaler()
-    scaler.load(PROCESSED_DATA_PATH / scaler.pt)
+    scaler.load(PROCESSED_DATA_PATH / "scaler.pt")
 
     test_dataset = UrbanSedDataset(PROCESSED_DATA_PATH, fold="test", scaler=scaler)
     test_loader = DataLoader(
@@ -63,7 +63,7 @@ def main():
     total_fn = torch.zeros(10).to(device)
 
     logger.info("\n Starting evaluation pass")
-    test_loop = tqdm.tqdm(test_dataset, desc="testing")
+    test_loop = tqdm.tqdm(test_loader, desc="testing")
 
     with torch.no_grad():
         for features, labels in test_loop:
@@ -72,7 +72,7 @@ def main():
             # resahpe
             batch_size, num_sequences, height, width = features.shape
             features = features.view(batch_size * num_sequences, 1, height, width)
-            labels = labels.view(batch_size * num_sequences)
+            labels = labels.view(batch_size * num_sequences, -1)
 
             # forward pass
             probs = model.predict(features)
@@ -112,11 +112,7 @@ def main():
 
     # --- 6. Formatting, Logging and Saving ---
     # Construct a dictionary report
-    dataset_classes = (
-        test_dataset.classes
-        if hasattr(test_dataset, "classes")
-        else [f"Class_{i}" for i in range(10)]
-    )
+    dataset_classes = URBAN_SED_CLASSES
 
     per_class_results = {}
     for i, cls_name in enumerate(dataset_classes):
@@ -144,16 +140,18 @@ def main():
     }
 
     # Save to JSON
-    reports_dir = Path("reports")
-    reports_dir.mkdir(exist_ok=True)
-    report_file = reports_dir / "evaluation_results.json"
+    reports_dir = Path("logs/reports")
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    time_stamp = datetime.now().strftime("%Y%m%d_%H%M")
+
+    report_file = reports_dir / f"{time_stamp}_evaluation_results.json"
 
     with open(report_file, "w") as f:
         json.dump(results_report, f, indent=4)
 
     # logger output
     logger.info("=" * 50)
-    logger.info("         EVALUATION REPORT")
+    logger.info("EVALUATION REPORT")
     logger.info("=" * 50)
     logger.info(f"Model: {CHECKPOINT_PATH.name}")
     logger.info(f"Threshold: {THRESHOLD}")

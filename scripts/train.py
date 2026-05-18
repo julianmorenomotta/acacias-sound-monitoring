@@ -22,8 +22,11 @@ MODEL_SAVE_PATH.parent.mkdir(parents=True, exist_ok=True)
 BATCH_SIZE = 32
 LEARNING_RATE = 1e-4
 EPOCHS = 500
-PATIENCE = 30
+PATIENCE = 50
 NUM_WORKERS = 4
+
+log_dir = Path("logs")
+log_dir.mkdir(parents=True, exist_ok=True)
 
 parser = argparse.ArgumentParser(description="Train SBCNNSed model")
 parser.add_argument(
@@ -35,7 +38,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 logging.basicConfig(
-    filename="train.log",
+    filename=str(log_dir / "train.log"),
     filemode="a",
     format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO,
