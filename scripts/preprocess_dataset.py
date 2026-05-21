@@ -9,8 +9,8 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), "../src"))
 
 from sbcnn_sed.data.features import MelSpectrogramExtractor
-from sbcnn_sed.data.scaler import MinMaxScaler
-from sbcnn_sed.data.dataset import URBAN_SED_CLASSES
+from sbcnn_sed.utils.scaler import MinMaxScaler
+from sbcnn_sed.utils.constants import URBAN_SED_CLASSES
 
 
 def get_event_roll(

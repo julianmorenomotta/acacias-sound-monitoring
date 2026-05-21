@@ -1,18 +1,26 @@
 import yaml
 import torch
-import librosa
 import numpy as np
+from pathlib import Path
 
-from sbcnn_sed.data.dataset import UrbanSedDataset, URBAN_SED_CLASSES
-from sbcnn_sed.data.scaler import MinMaxScaler
+from sbcnn_sed.utils.constants import URBAN_SED_CLASSES
+from sbcnn_sed.utils.scaler import MinMaxScaler
 from sbcnn_sed.model.models import SBCNNSed
 from sbcnn_sed.data.features import MelSpectrogramExtractor
 
 
 class SoundEventDetector:
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: str | Path):
+        config_path = Path(config_path).resolve()
         with open(config_path, "r") as f:
             self.config = yaml.safe_load(f)
+
+        config_dir = config_path.parent
+
+        for key, path in self.config.get("paths", {}).items():
+            p = Path(path)
+            if not p.is_absolute():
+                self.config["paths"][key] = str((config_dir / p).resolve())
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -31,7 +39,10 @@ class SoundEventDetector:
         # model initialization
         self.model = SBCNNSed()
         weights_path = self.config["paths"]["model_weights"]
-        self.model.load_state_dict(torch.load(weights_path, map_location=self.device))
+
+        checkpoint = torch.load(weights_path, map_location=self.device)
+
+        self.model.load_state_dict(checkpoint["model_state_dict"])
         self.model.to(self.device)
         self.model.eval()
 
@@ -52,6 +63,7 @@ class SoundEventDetector:
         # Forward pass
         with torch.no_grad():
             probs = self.model.predict(inputs)
+            probs = probs.cpu().numpy()
         # Convert output to numpy and smooth the events
         # return the JSON event list
         return self._smooth_events(probs)
@@ -62,7 +74,7 @@ class SoundEventDetector:
         Returns a lis of structured events.
         """
         inf_cfg = self.config.get("inference", {})
-        treshold = inf_cfg.get("confidence_treshold", 0.5)
+        threshold = inf_cfg.get("confidence_threshold", 0.5)
         merge_gap = inf_cfg.get("merge_gap_seconds", 1.0)
 
         audio_cfg = self.config.get("audio", {})
@@ -70,17 +82,46 @@ class SoundEventDetector:
         seq_time = audio_cfg.get("sequence_time", 1.0)
 
         events = []
-        num_windows, num_classes = probablities.shape
+        num_windows, num_classes = probabilities.shape
 
         for class_idx in range(num_classes):
             class_name = URBAN_SED_CLASSES[class_idx]
             class_probs = probabilities[:, class_idx]
 
-            # find which windows crossed the treshold for the class
-            active_frames = np.where(class_probs > treshold)[0]
+            # find which windows crossed the threshold for the class
+            active_frames = np.where(class_probs > threshold)[0]
             if len(active_frames) == 0:
                 continue
 
             current_event = {
                 "event": class_name,
+                "start": float(active_frames[0] * hop_time),
+                "end": float(active_frames[0] * hop_time + seq_time),
+                "confidence": float(class_probs[active_frames[0]]),
             }
+
+            for i in range(1, len(active_frames)):
+                frame_idx = active_frames[i]
+                frame_start = float(frame_idx * hop_time)
+                frame_end = float(frame_start + seq_time)
+                frame_prob = float(class_probs[frame_idx])
+
+                if (frame_start - current_event["end"]) <= merge_gap:
+                    current_event["end"] = max(current_event["end"], frame_end)
+                    current_event["confidence"] = max(
+                        current_event["confidence"], frame_prob
+                    )
+
+                else:
+                    events.append(current_event)
+                    current_event = {
+                        "event": class_name,
+                        "start": frame_start,
+                        "end": frame_end,
+                        "confidence": frame_prob,
+                    }
+
+            events.append(current_event)
+        events.sort(key=lambda x: x["start"])
+
+        return events

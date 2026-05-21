@@ -10,8 +10,9 @@ from datetime import datetime
 # Ensure src is in the path
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-from sbcnn_sed.data.dataset import UrbanSedDataset, URBAN_SED_CLASSES
-from sbcnn_sed.data.scaler import MinMaxScaler
+from sbcnn_sed.utils.constants import URBAN_SED_CLASSES
+from sbcnn_sed.data.dataset import UrbanSedDataset
+from sbcnn_sed.utils.scaler import MinMaxScaler
 from sbcnn_sed.model.models import SBCNNSed
 
 logging.basicConfig(

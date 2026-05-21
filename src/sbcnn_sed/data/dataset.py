@@ -3,22 +3,9 @@ from torch.utils.data import Dataset
 from pathlib import Path
 import logging
 from typing import Optional, Tuple
-from sbcnn_sed.data.scaler import MinMaxScaler
+from sbcnn_sed.utils.scaler import MinMaxScaler
 
 logger = logging.getLogger(__name__)
-
-URBAN_SED_CLASSES = [
-    "air_conditioner",
-    "car_horn",
-    "children_playing",
-    "dog_bark",
-    "drilling",
-    "engine_idling",
-    "gun_shot",
-    "jackhammer",
-    "siren",
-    "street_music",
-]
 
 
 class UrbanSedDataset(Dataset):
