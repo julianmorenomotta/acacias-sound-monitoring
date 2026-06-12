@@ -70,20 +70,20 @@ jobs:
           sudo apt-get install -y git-lfs
 
           cd /tmp/hf-space-repo
+
           git lfs install
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           rsync -a --delete --exclude='.git' --exclude='.gitattributes' /tmp/hf-space-bundle/ ./
-          
+
           git lfs track "*.pth"
           git lfs track "*.pt"
           git lfs track "*.pickle"
 
-
           git add .
-          git commit -m 'Deploy updated sound monitor' || echo "No changes to commit"
+          git commit -m 'Deploy' 
 
-          git lfs migrate import --include="*.pth, *.pt *.pickle" --everything
+          git lfs migrate import --include="*.pth, *.pt, *.pickle" --everything
           
-          git push origin --all  --force
+          git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}" main
