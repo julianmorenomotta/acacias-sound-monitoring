@@ -86,4 +86,4 @@ jobs:
 
           git lfs migrate import --include="*.pth, *.pt *.pickle" --everything
           
-          git push origin --
+          git push origin --all  --force
