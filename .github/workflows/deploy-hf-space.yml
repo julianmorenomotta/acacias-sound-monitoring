@@ -77,6 +77,8 @@ jobs:
 
           rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
 
+          git lfs migrate import --include="*.pth" --include-ref=refs/heads/main
+
           git add .
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
