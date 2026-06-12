@@ -1,20 +1,24 @@
 import sys
-import gradio as gr
+import importlib
 from pathlib import Path
 
-current_dir = Path(__file__).parent.resolve()
-root_dir = current_dir.parent
-sys.path.append(str(root_dir / "src"))
+import gradio as gr
 
-from sbcnn_sed.pipeline.inference import SoundEventDetector
+current_dir = Path(__file__).resolve().parent
+project_root = current_dir if (current_dir / "configs").exists() else current_dir.parent
+sys.path.insert(0, str(project_root / "src"))
 
-config_path = root_dir / "configs" / "inference.yaml"
+SoundEventDetector = importlib.import_module(
+    "sbcnn_sed.pipeline.inference"
+).SoundEventDetector
+
+config_path = project_root / "configs" / "inference.yaml"
 
 try:
     detector = SoundEventDetector(config_path)
-    print("Sound event detecrot model loaded successfully.")
+    print("Sound event detector model loaded successfully.")
 except Exception as e:
-    print(f"Faild to load detector model: {e}")
+    print(f"Failed to load detector model: {e}")
     detector = None
 
 

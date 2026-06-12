@@ -12,4 +12,6 @@ __pycache__
 *.log
 
 # models
-/models
+/models/*
+!/models/checkpoints/best_sed_model.pth
+
