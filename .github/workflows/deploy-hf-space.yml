@@ -78,15 +78,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          rsync -a --delete --exclude='.git' --exclude='.gitattributes' /tmp/hf-space-bundle/ ./
-
+          # Step 1: Set up LFS tracking
           git lfs track "*.pth"
           git lfs track "*.pt"
           git lfs track "*.pickle"
 
-          git add .
-          git commit -m 'Deploy' 
+          # Step 2: Commit .gitattributes so LFS clean filter is active
+          git add .gitattributes
+          git commit -m 'Update LFS patterns' || true
 
-          git lfs migrate import --include="*.pth,*.pt,*.pickle" --everything
-          
+          # Step 3: Copy files (LFS is now fully configured)
+          rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
+
+          # Step 4: Add and commit — LFS clean filter intercepts .pth
+          git add .
+          git commit -m 'Deploy'
+
+          # Step 5: Push — LFS objects should be in .git/lfs/objects/
           git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}" main
