@@ -71,20 +71,19 @@ jobs:
 
           cd /tmp/hf-space-repo
           git lfs install
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          rsync -a --delete --exclude='.git' --exclude='.gitattributes' /tmp/hf-space-bundle/ ./
+          
           git lfs track "*.pth"
           git lfs track "*.pt"
           git lfs track "*.pickle"
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add .gitattributes
-          git commit -m 'Update LFS patterns' || echo "No .gitattributes changes"
-
-          rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
 
           git add .
-          git commit -m "Deploy updated Acacias Sound Monitor" || echo "No changes to commit"
+          git commit -m 'Deploy updated sound monitor' || echo "No changes to commit"
+
+          git lfs migrate import --include="*.pth, *.pt *.pickle" --everything
           
-          git lfs push origin --all
-          git push origin --all
+          git push origin --
