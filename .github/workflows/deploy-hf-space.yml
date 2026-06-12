@@ -75,13 +75,16 @@ jobs:
           git lfs track "*.pt"
           git lfs track "*.pickle"
 
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add .gitattributes
           git commit -m 'Update LFS patterns' || echo "No .gitattributes changes"
 
           rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
 
           git add .
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "Deploy updated Acacias Sound Monitor" || echo "No changes to commit"
+          
+          git lfs push origin --all
           git push origin --all
