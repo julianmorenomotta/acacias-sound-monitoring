@@ -78,21 +78,25 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Step 1: Set up LFS tracking
-          git lfs track "*.pth"
-          git lfs track "*.pt"
-          git lfs track "*.pickle"
-
-          # Step 2: Commit .gitattributes so LFS clean filter is active
-          git add .gitattributes
-          git commit -m 'Update LFS patterns' || true
-
-          # Step 3: Copy files (LFS is now fully configured)
+          # Copy files first
           rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
 
-          # Step 4: Add and commit — LFS clean filter intercepts .pth
+          # Add and commit (file is committed as regular binary)
           git add .
           git commit -m 'Deploy'
 
-          # Step 5: Push — LFS objects should be in .git/lfs/objects/
+          # DEBUG: Check what we have before migrate
+          echo "=== Before migrate ==="
+          git ls-files --stage models/checkpoints/best_sed_model.pth
+          ls -la .git/lfs/objects/ 2>/dev/null || echo "No LFS objects yet"
+
+          # Migrate only the .pth file in the last commit
+          git lfs migrate import --include="*.pth" --verbose
+
+          # DEBUG: Check what we have after migrate
+          echo "=== After migrate ==="
+          git ls-files --stage models/checkpoints/best_sed_model.pth
+          find .git/lfs/objects -type f 2>/dev/null || echo "No LFS objects after migrate"
+
+          # Push
           git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}" main
