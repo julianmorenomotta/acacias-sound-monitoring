@@ -64,6 +64,9 @@ jobs:
           git clone "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}" /tmp/hf-space-repo
 
       - name: Push deployment bundle to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_REPO: ${{ secrets.HF_SPACE_REPO }}
         run: |
           set -euo pipefail
           sudo apt-get update
@@ -84,6 +87,6 @@ jobs:
           git add .
           git commit -m 'Deploy' 
 
-          git lfs migrate import --include="*.pth, *.pt, *.pickle" --everything
+          git lfs migrate import --include="*.pth,*.pt,*.pickle" --everything
           
           git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}" main
