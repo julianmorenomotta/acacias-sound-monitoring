@@ -75,7 +75,7 @@ jobs:
           git lfs track "*.pt"
           git lfs track "*.pickle"
 
-          git add .gitatributes
+          git add .gitattributes
           git commit -m "Update LFS patterns || echo "No .gitatributes changes"
 
           rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
