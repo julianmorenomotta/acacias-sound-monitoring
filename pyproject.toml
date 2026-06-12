@@ -13,6 +13,7 @@ dependencies = [
     "tqdm>=4.66.5",
     "pandas>=3.0.2",
     "wandb>=0.26.1",
+    "gradio>=6.15.2",
 ]
 
 # development only dependencies notebooks and etc...

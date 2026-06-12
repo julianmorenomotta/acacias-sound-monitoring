@@ -12,7 +12,7 @@ import tqdm as tqdm
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from sbcnn_sed.data.dataset import UrbanSedDataset
-from sbcnn_sed.data.scaler import MinMaxScaler
+from sbcnn_sed.utils.scaler import MinMaxScaler
 from sbcnn_sed.model.models import SBCNNSed
 
 PROCESSED_DATA_PATH = Path("data/processed/URBAN-SED_v2.0.0")

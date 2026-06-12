@@ -1,0 +1,84 @@
+name: Deploy Hugging Face Space
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "configs/**"
+      - "src/**"
+      - "models/checkpoints/**"
+      - "pyproject.toml"
+      - ".github/workflows/deploy-hf-space.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: latest
+
+      - name: Regenerate Hugging Face requirements from uv lock
+        run: uv pip compile pyproject.toml -o app/requirements.txt
+
+      - name: Normalize requitements for hugging Face Space
+        run: |
+          set -euo pipefail
+          # Remove CUDA specific pacakges and sufixxes
+          sed -i \
+            -e '/^nvidia-/d' \
+            -e 's/+cu[0-9]\{2,\}//g' \
+            app/requirements.txt
+          echo "=== Normalized requirements.txt ==="
+          cat app/requirements.txt
+
+      - name: Prepare deployment bundle
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/hf-space-bundle
+          mkdir -p /tmp/hf-space-bundle/models/checkpoints
+
+          cp app/app.py /tmp/hf-space-bundle/app.py
+          cp app/requirements.txt /tmp/hf-space-bundle/requirements.txt
+          cp README.md /tmp/hf-space-bundle/README.md
+          cp -r configs /tmp/hf-space-bundle/configs
+          cp -r src /tmp/hf-space-bundle/src
+          cp models/checkpoints/best_sed_model.pth /tmp/hf-space-bundle/models/checkpoints/best_sed_model.pth
+
+      - name: Clone Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_REPO: ${{ secrets.HF_SPACE_REPO }}
+        run: |
+          set -euo pipefail
+          git clone "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}" /tmp/hf-space-repo
+
+      - name: Push deployment bundle to Hugging Face
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+
+          cd /tmp/hf-space-repo
+          git lfs install
+          git lfs track "*.pth"
+          git lfs track "*.pt"
+          git lfs track "*.pickle"
+
+          rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
+
+          git add .
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Deploy updated Acacias Sound Monitor" || echo "No changes to commit"
+          git push

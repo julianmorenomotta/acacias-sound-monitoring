@@ -1,0 +1,23 @@
+paths:
+  model_weights: "../models/checkpoints/best_sed_model.pth"
+  scaler: "../data/processed/URBAN-SED_v2.0.0/scaler.pt"
+
+audio:
+  sample_rate: 22050
+  sequence_time: 1.0
+  sequence_hop_time: 0.5
+
+inference:
+  confidence_threshold: 0.5
+  merge_gap_seconds: 1.0
+  classes: 
+    - "air_conditioner"
+    - "car_horn"
+    - "children_playing"
+    - "dog_bark"
+    - "drilling"
+    - "engine_idling"
+    - "gun_shot"
+    - "jackhammer"
+    - "siren"
+    - "street_music"
