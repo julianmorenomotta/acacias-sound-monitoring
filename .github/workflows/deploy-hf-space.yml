@@ -50,6 +50,7 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/hf-space-bundle
           mkdir -p /tmp/hf-space-bundle/models/checkpoints
+          mkdir -p /tmp/hf-space-bundle/data
 
           cp app/app.py /tmp/hf-space-bundle/app.py
           cp app/requirements.txt /tmp/hf-space-bundle/requirements.txt
@@ -57,7 +58,7 @@ jobs:
           cp -r configs /tmp/hf-space-bundle/configs
           cp -r src /tmp/hf-space-bundle/src
           cp models/checkpoints/best_sed_model.pth /tmp/hf-space-bundle/models/checkpoints/best_sed_model.pth
-          cp data/processed/URBAN-SED_v2.0.0/scaler.pt /tmp/hf-space-bundel/data/processed/URBAN-SED_v2.0.0/scaler.pt
+          cp data/processed/URBAN-SED_v2.0.0/scaler.pt /tmp/hf-space-bundel/data/scaler.pt
 
       - name: Clone Hugging Face Space
         env:
