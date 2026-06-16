@@ -1,6 +1,6 @@
 paths:
   model_weights: "../models/checkpoints/best_sed_model.pth"
-  scaler: "../data/processed/URBAN-SED_v2.0.0/scaler.pt"
+  scaler: "../data/scaler.pt"
 
 audio:
   sample_rate: 22050
