@@ -78,22 +78,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Step 1: Set up LFS tracking in a separate commit
-          git lfs track "*.pth"
-          git lfs track "*.pt"
-          git lfs track "*.pickle"
-          git add .gitattributes
-          git commit -m 'Update LFS patterns'
-
-          # Step 2: Copy files (rsync will NOT delete .gitattributes since it's committed)
+          # Copy files
           rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
 
-          # Step 3: Add and commit
+          # Force LFS to track .pth files by directly updating .gitattributes
+          echo "*.pth filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+          echo "*.pt filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+          echo "*.pickle filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+
+          # Remove the file from index and re-add it so LFS clean filter processes it
+          git rm --cached models/checkpoints/best_sed_model.pth
+          git add models/checkpoints/best_sed_model.pth
+
+          # Add everything else
           git add .
           git commit -m 'Deploy'
 
-          # Step 4: Migrate .pth to LFS — .gitattributes now exists in history
-          git lfs migrate import --include="*.pth,*.pt,*.pickle" --everything
-
-          # Step 5: Push
+          # Push
           git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}" main
