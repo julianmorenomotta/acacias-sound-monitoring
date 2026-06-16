@@ -1,5 +1,7 @@
 # datasets
-/data
+/data/*
+# include the scaler in LFS
+!/data/processed/URBAN-SED_v2.0.0/scaler.pt
 
 # cache
 __pycache__
@@ -15,5 +17,3 @@ __pycache__
 /models/*
 !/models/checkpoints/best_sed_model.pth
 
-# include the scaler in LFS
-!/data/processed/URBAN-SED_v.2.0.0/scaler.pt
