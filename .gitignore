@@ -1,7 +1,7 @@
 # datasets
 /data/**
 # include the scaler in LFS
-!/data/processed/URBAN-SED_v2.0.0/scaler.pt
+!/data/processed/URBAN-SED_v2.0.0/**
 
 # cache
 __pycache__
