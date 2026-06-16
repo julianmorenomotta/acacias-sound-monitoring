@@ -86,12 +86,14 @@ jobs:
           echo "*.pt filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
           echo "*.pickle filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
 
-          # Remove the file from index and re-add it so LFS clean filter processes it
-          git rm --cached models/checkpoints/best_sed_model.pth
-          git add models/checkpoints/best_sed_model.pth
-
-          # Add everything else
+          # Add everything — LFS clean filter should intercept .pth
           git add .
+
+          # Verify the .pth was stored as an LFS pointer
+          echo "=== Verifying LFS ==="
+          git ls-files --stage models/checkpoints/best_sed_model.pth
+          find .git/lfs/objects -type f 2>/dev/null || echo "No LFS objects"
+
           git commit -m 'Deploy'
 
           # Push
