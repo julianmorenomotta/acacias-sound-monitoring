@@ -81,20 +81,28 @@ jobs:
           # Copy files
           rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
 
-          # Force LFS to track .pth files by directly updating .gitattributes
-          echo "*.pth filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
-          echo "*.pt filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
-          echo "*.pickle filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+          # Manually create LFS object and pointer for .pth file
+          PTH_FILE="models/checkpoints/best_sed_model.pth"
+          PTH_OID=$(git hash-object "$PTH_FILE")
+          PTH_SIZE=$(stat --format=%s "$PTH_FILE")
 
-          # Add everything — LFS clean filter should intercept .pth
+          # Store the file in LFS objects directory
+          LFS_OBJECT_DIR=".git/lfs/objects/${PTH_OID:0:2}/${PTH_OID:2:2}"
+          mkdir -p "$LFS_OBJECT_DIR"
+          cp "$PTH_FILE" "$LFS_OBJECT_DIR/$PTH_OID"
+
+          # Create LFS pointer content
+          POINTER="version https://git-lfs.github.com/spec/v1
+oid sha256:$PTH_OID
+size $PTH_SIZE
+"
+          # Write pointer to the working tree
+          echo "$POINTER" > "$PTH_FILE"
+
+          # Add everything
           git add .
-
-          # Verify the .pth was stored as an LFS pointer
-          echo "=== Verifying LFS ==="
-          git ls-files --stage models/checkpoints/best_sed_model.pth
-          find .git/lfs/objects -type f 2>/dev/null || echo "No LFS objects"
-
           git commit -m 'Deploy'
 
-          # Push
+          # Push LFS objects first, then refs
+          git lfs push origin --all
           git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}" main
