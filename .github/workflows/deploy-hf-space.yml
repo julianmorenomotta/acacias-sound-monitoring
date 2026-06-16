@@ -38,6 +38,8 @@ jobs:
           sed -i \
             -e '/^nvidia-/d' \
             -e 's/+cu[0-9]\{2,\}//g' \
+            -e '/^pydantic==/d' \
+            -e '/^pydantic-core==/d' \
             app/requirements.txt
           echo "=== Normalized requirements.txt ==="
           cat app/requirements.txt
