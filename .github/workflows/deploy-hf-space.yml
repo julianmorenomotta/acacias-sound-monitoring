@@ -100,6 +100,19 @@ jobs:
           # Create LFS pointer using git lfs pointer (computes correct SHA256)
           git lfs pointer --file="$PTH_FILE" > "$PTH_FILE"
 
+          # Manually create LFS object and pointer for .pt scaler
+          PT_FILE="data/scaler.pt"
+          PT_OID=$(sha256sum "$PT_FILE" | cut -d' ' -f1)
+          PT_SIZE=$(stat --format=%s "$PT_FILE")
+
+          # Store the file in LFS objects directory
+          LFS_OBJECT_DIR=".git/lfs/objects/${PT_OID:0:2}/${PT_OID:2:2}"
+          mkdir -p "$LFS_OBJECT_DIR"
+          cp "$PT_FILE" "$LFS_OBJECT_DIR/$PT_OID"
+
+          # Create LFS pointer using git lfs pointer (computes correct SHA256)
+          git lfs pointer --file="$PT_FILE" > "$PT_FILE"
+
           # Add everything
           git add .
           git commit -m 'Deploy'
