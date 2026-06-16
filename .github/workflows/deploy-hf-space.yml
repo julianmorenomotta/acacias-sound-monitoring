@@ -50,7 +50,7 @@ jobs:
 
           cp app/app.py /tmp/hf-space-bundle/app.py
           cp app/requirements.txt /tmp/hf-space-bundle/requirements.txt
-          cp README.md /tmp/hf-space-bundle/README.md
+          cp app/README.md /tmp/hf-space-bundle/README.md
           cp -r configs /tmp/hf-space-bundle/configs
           cp -r src /tmp/hf-space-bundle/src
           cp models/checkpoints/best_sed_model.pth /tmp/hf-space-bundle/models/checkpoints/best_sed_model.pth
