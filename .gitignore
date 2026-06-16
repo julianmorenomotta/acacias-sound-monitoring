@@ -1,5 +1,5 @@
 # datasets
-/data/*
+/data/**
 # include the scaler in LFS
 !/data/processed/URBAN-SED_v2.0.0/scaler.pt
 
