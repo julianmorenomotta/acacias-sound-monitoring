@@ -83,7 +83,7 @@ jobs:
 
           # Manually create LFS object and pointer for .pth file
           PTH_FILE="models/checkpoints/best_sed_model.pth"
-          PTH_OID=$(git hash-object "$PTH_FILE")
+          PTH_OID=$(sha256sum "$PTH_FILE" | cut -d' ' -f1)
           PTH_SIZE=$(stat --format=%s "$PTH_FILE")
 
           # Store the file in LFS objects directory
@@ -91,8 +91,8 @@ jobs:
           mkdir -p "$LFS_OBJECT_DIR"
           cp "$PTH_FILE" "$LFS_OBJECT_DIR/$PTH_OID"
 
-          # Create LFS pointer and write it to the working tree
-          printf "version https://git-lfs.github.com/spec/v1\noid sha256:%s\nsize %s\n" "$PTH_OID" "$PTH_SIZE" > "$PTH_FILE"
+          # Create LFS pointer using git lfs pointer (computes correct SHA256)
+          git lfs pointer --file="$PTH_FILE" --write > "$PTH_FILE"
 
           # Add everything
           git add .
