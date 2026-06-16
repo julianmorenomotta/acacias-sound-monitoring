@@ -11,6 +11,7 @@ on:
       - "models/checkpoints/**"
       - "pyproject.toml"
       - ".github/workflows/deploy-hf-space.yml"
+      - "data/**"
   workflow_dispatch:
 
 jobs:
