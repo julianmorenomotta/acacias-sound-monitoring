@@ -92,7 +92,7 @@ jobs:
           cp "$PTH_FILE" "$LFS_OBJECT_DIR/$PTH_OID"
 
           # Create LFS pointer using git lfs pointer (computes correct SHA256)
-          git lfs pointer --file="$PTH_FILE" --write > "$PTH_FILE"
+          git lfs pointer --file="$PTH_FILE" > "$PTH_FILE"
 
           # Add everything
           git add .
