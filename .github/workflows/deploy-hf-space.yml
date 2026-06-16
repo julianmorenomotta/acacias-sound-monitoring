@@ -91,13 +91,8 @@ jobs:
           mkdir -p "$LFS_OBJECT_DIR"
           cp "$PTH_FILE" "$LFS_OBJECT_DIR/$PTH_OID"
 
-          # Create LFS pointer content
-          POINTER="version https://git-lfs.github.com/spec/v1
-oid sha256:$PTH_OID
-size $PTH_SIZE
-"
-          # Write pointer to the working tree
-          echo "$POINTER" > "$PTH_FILE"
+          # Create LFS pointer and write it to the working tree
+          printf "version https://git-lfs.github.com/spec/v1\noid sha256:%s\nsize %s\n" "$PTH_OID" "$PTH_SIZE" > "$PTH_FILE"
 
           # Add everything
           git add .
