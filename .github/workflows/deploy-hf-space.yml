@@ -40,6 +40,7 @@ jobs:
             -e 's/+cu[0-9]\{2,\}//g' \
             -e '/^pydantic==/d' \
             -e '/^pydantic-core==/d' \
+            -e '/^requests==/d' \
             app/requirements.txt
           echo "=== Normalized requirements.txt ==="
           cat app/requirements.txt
@@ -56,6 +57,7 @@ jobs:
           cp -r configs /tmp/hf-space-bundle/configs
           cp -r src /tmp/hf-space-bundle/src
           cp models/checkpoints/best_sed_model.pth /tmp/hf-space-bundle/models/checkpoints/best_sed_model.pth
+          cp data/processed/URBAN-SED_v2.0.0/scaler.pt /tmp/hf-space-bundel/data/processed/URBAN-SED_v2.0.0/scaler.pt
 
       - name: Clone Hugging Face Space
         env:
