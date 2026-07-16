@@ -1,0 +1,2 @@
+# Development roadmap
+The main idea of this document is to  present the current status of the project, define the low hanging fruit and some more long term goals that could be attainable for this project. Some of the considerations to place in this document is development that takes into account having edge devices run the inference. 
