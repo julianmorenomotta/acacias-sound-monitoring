@@ -45,8 +45,9 @@ class MinMaxScaler:
         Returns:
             torch.Tensor: Scaled tensor in range [-1, 1]
         """
-
-        return 2 * ((X - self.min_val) / (self.max_val - self.min_val))
+        if self.max_val == self.min_val:
+            return torch.zeros_like(X)
+        return 2 * ((X - self.min_val) / (self.max_val - self.min_val)) - 1
 
     def inverse_transform(self, X_scaled: torch.Tensor) -> torch.Tensor:
         """
@@ -59,7 +60,7 @@ class MinMaxScaler:
             torch.Tensor: Tensor scaled back to original scale
         """
 
-        return (self.max_val - self.min_val) * (X_scaled / 2.0 + 5.0) + self.min_val
+        return (self.max_val - self.min_val) * ((X_scaled + 1.0) / 2.0) + self.min_val
 
     def save(self, filepath: str | Path):
         """

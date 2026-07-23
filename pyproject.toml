@@ -24,6 +24,8 @@ dev = [
     "ipykernel",
     "matplotlib"
 ]
+[tool.setuptools.packages.find]
+where = ["src"]
 [[tool.uv.index]]
 name = "pytorch"
 url = "https://download.pytorch.org/whl/cu126"
