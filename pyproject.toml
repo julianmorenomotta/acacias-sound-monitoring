@@ -14,6 +14,8 @@ dependencies = [
     "pandas>=3.0.2",
     "wandb>=0.26.1",
     "gradio>=6.15.2",
+    "pytest>=9.1.1",
+    "ruff>=0.15.22",
 ]
 
 # development only dependencies notebooks and etc...
