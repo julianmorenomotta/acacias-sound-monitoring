@@ -1,7 +1,4 @@
 import torch
-import pytest
-import tempfile
-from pathlib import Path
 from sbcnn_sed.utils.scaler import MinMaxScaler
 
 
