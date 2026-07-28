@@ -23,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
+      - name: Install package
+        run: uv pip install -e .
+
       - name: Lint with ruff
         run: uv run ruff check src/ scripts/
 
