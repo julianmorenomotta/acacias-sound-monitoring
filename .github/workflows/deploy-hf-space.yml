@@ -54,6 +54,8 @@ jobs:
           mkdir -p /tmp/hf-space-bundle/data
 
           cp app/app.py /tmp/hf-space-bundle/app.py
+          cp app/api.py /tmp/hf-space-bundle/api.py
+          cp app/inference.py /tmp/hf-space-bundle/inference.py
           cp app/requirements.txt /tmp/hf-space-bundle/requirements.txt
           cp app/README.md /tmp/hf-space-bundle/README.md
           cp -r configs /tmp/hf-space-bundle/configs

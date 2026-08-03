@@ -1,35 +1,14 @@
-import sys
-import importlib
-from pathlib import Path
-
 import gradio as gr
-
-current_dir = Path(__file__).resolve().parent
-project_root = current_dir if (current_dir / "configs").exists() else current_dir.parent
-sys.path.insert(0, str(project_root / "src"))
-
-SoundEventDetector = importlib.import_module(
-    "sbcnn_sed.pipeline.inference"
-).SoundEventDetector
-
-config_path = project_root / "configs" / "inference.yaml"
-
-try:
-    detector = SoundEventDetector(config_path)
-    print("Sound event detector model loaded successfully.")
-except Exception as e:
-    print(f"Failed to load detector model: {e}")
-    detector = None
+from inference import detector
+import api
 
 
 def process_audio(audio_filepath):
     if detector is None:
-        return {"error": "Model failed to load."}
+        return {"error": "Model failed to load"}
     if not audio_filepath:
-        return {"error": "Audio not provided."}
-
-    predictions = detector.predict(audio_filepath)
-    return predictions
+        return {"error": "Audio not provided"}
+    return detector.predict(audio_filepath)
 
 
 with gr.Blocks(title="Sound Monitor") as demo:
@@ -49,4 +28,7 @@ with gr.Blocks(title="Sound Monitor") as demo:
     submit_btn.click(fn=process_audio, inputs=audio_input, outputs=json_output)
 
 if __name__ == "__main__":
+    demo.app.include_router(api.router)
     demo.launch(server_name="0.0.0.0", share=False)
+
+__all__ = ["detector", "demo", "process_audio"]
