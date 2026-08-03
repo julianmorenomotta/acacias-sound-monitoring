@@ -15,7 +15,7 @@ async def health():
 
 
 @router.post("/predict")
-async def predict(audio: UploadFile = File()):
+async def predict(audio: UploadFile = File(...)):
     """Run SED on an uploaded audio file"""
     if detector is None:
         raise HTTPException(status_code=503, detail="Model failed to load on startup")
@@ -26,7 +26,7 @@ async def predict(audio: UploadFile = File()):
     if suffix not in allowed_extensions:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file formatt '{suffix}'."
+            detail=f"Unsupported file format '{suffix}'."
             f"Allowed: {', '.join(sorted(allowed_extensions))}",
         )
 
