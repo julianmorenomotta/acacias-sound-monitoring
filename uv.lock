@@ -743,10 +743,12 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "accelerate" },
+    { name = "fastapi" },
     { name = "gradio" },
     { name = "librosa" },
     { name = "pandas" },
     { name = "pytest" },
+    { name = "python-multipart" },
     { name = "ruff" },
     { name = "soundfile" },
     { name = "torch" },
@@ -772,12 +774,14 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "accelerate", specifier = ">=0.26.0" },
+    { name = "fastapi" },
     { name = "gradio", specifier = ">=6.15.2" },
     { name = "ipykernel", marker = "extra == 'dev'" },
     { name = "librosa", specifier = ">=0.11.0" },
     { name = "matplotlib", marker = "extra == 'dev'" },
     { name = "pandas", specifier = ">=3.0.2" },
     { name = "pytest", specifier = ">=9.1.1" },
+    { name = "python-multipart" },
     { name = "ruff", specifier = ">=0.15.22" },
     { name = "soundfile", specifier = ">=0.13.1" },
     { name = "torch", specifier = "==2.9.1" },
