@@ -14,8 +14,13 @@ dependencies = [
     "pandas>=3.0.2",
     "wandb>=0.26.1",
     "gradio>=6.15.2",
+<<<<<<< HEAD
     "fastapi",
     "python-multipart"
+=======
+    "pytest>=9.1.1",
+    "ruff>=0.15.22",
+>>>>>>> main
 ]
 
 # development only dependencies notebooks and etc...
@@ -24,6 +29,8 @@ dev = [
     "ipykernel",
     "matplotlib"
 ]
+[tool.setuptools.packages.find]
+where = ["src"]
 [[tool.uv.index]]
 name = "pytorch"
 url = "https://download.pytorch.org/whl/cu126"

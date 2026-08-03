@@ -17,5 +17,5 @@ __pycache__
 /models/*
 !/models/checkpoints/best_sed_model.pth
 
-# automatically generated files
+# build artifacts
 *.egg-info
