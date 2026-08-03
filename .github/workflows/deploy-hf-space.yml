@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout source repository
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
@@ -51,8 +53,9 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/hf-space-bundle
           mkdir -p /tmp/hf-space-bundle/models/checkpoints
-          mkdir -p /tmp/hf-space-bundle/data
+          mkdir -p /tmp/hf-space-bundle/data/processed/URBAN-SED_v2.0.0
 
+          cp .gitattributes /tmp/hf-space-bundle/.gitattributes
           cp app/app.py /tmp/hf-space-bundle/app.py
           cp app/api.py /tmp/hf-space-bundle/api.py
           cp app/inference.py /tmp/hf-space-bundle/inference.py
@@ -61,7 +64,11 @@ jobs:
           cp -r configs /tmp/hf-space-bundle/configs
           cp -r src /tmp/hf-space-bundle/src
           cp models/checkpoints/best_sed_model.pth /tmp/hf-space-bundle/models/checkpoints/best_sed_model.pth
-          cp data/processed/URBAN-SED_v2.0.0/scaler.pt /tmp/hf-space-bundle/data/scaler.pt
+          cp data/processed/URBAN-SED_v2.0.0/scaler.pt /tmp/hf-space-bundle/data/processed/URBAN-SED_v2.0.0/scaler.pt
+
+          file /tmp/hf-space-bundle/models/checkpoints/best_sed_model.pth
+          file /tmp/hf-space-bundle/data/processed/URBAN-SED_v2.0.0/scaler.pt
+
 
       - name: Clone Hugging Face Space
         env:
@@ -88,32 +95,6 @@ jobs:
 
           # Copy files
           rsync -a --delete --exclude='.git' /tmp/hf-space-bundle/ ./
-
-          # Manually create LFS object and pointer for .pth file
-          PTH_FILE="models/checkpoints/best_sed_model.pth"
-          PTH_OID=$(sha256sum "$PTH_FILE" | cut -d' ' -f1)
-          PTH_SIZE=$(stat --format=%s "$PTH_FILE")
-
-          # Store the file in LFS objects directory
-          LFS_OBJECT_DIR=".git/lfs/objects/${PTH_OID:0:2}/${PTH_OID:2:2}"
-          mkdir -p "$LFS_OBJECT_DIR"
-          cp "$PTH_FILE" "$LFS_OBJECT_DIR/$PTH_OID"
-
-          # Create LFS pointer using git lfs pointer (computes correct SHA256)
-          git lfs pointer --file="$PTH_FILE" > "$PTH_FILE"
-
-          # Manually create LFS object and pointer for .pt scaler
-          PT_FILE="data/scaler.pt"
-          PT_OID=$(sha256sum "$PT_FILE" | cut -d' ' -f1)
-          PT_SIZE=$(stat --format=%s "$PT_FILE")
-
-          # Store the file in LFS objects directory
-          LFS_OBJECT_DIR=".git/lfs/objects/${PT_OID:0:2}/${PT_OID:2:2}"
-          mkdir -p "$LFS_OBJECT_DIR"
-          cp "$PT_FILE" "$LFS_OBJECT_DIR/$PT_OID"
-
-          # Create LFS pointer using git lfs pointer (computes correct SHA256)
-          git lfs pointer --file="$PT_FILE" > "$PT_FILE"
 
           # Add everything
           git add .
