@@ -1,0 +1,8 @@
+sample_rate: 22050
+n_fft: 1024
+win_length: 1024
+hop_length: 680
+n_mels: 64
+sequence_time: 1.0
+sequence_hop_time: 0.5
+pad_mode: reflect

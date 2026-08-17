@@ -1,0 +1,15 @@
+raw_path: data/raw/URBAN-SED_v2.0.0
+processed_path: data/processed/URBAN-SED_v2.0.0
+fold: test
+scaler_path: data/processed/URBAN-SED_v2.0.0/scaler.pt
+classes:
+  - air_conditioner
+  - car_horn
+  - children_playing
+  - dog_bark
+  - drilling
+  - engine_idling
+  - gun_shot
+  - jackhammer
+  - siren
+  - street_music

@@ -1,0 +1,6 @@
+defaults: 
+  - model: sb_cnn
+  - data: urban_sed
+  - features: default
+  - train: default
+  - eval: parity

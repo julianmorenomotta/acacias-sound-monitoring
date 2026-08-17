@@ -2,14 +2,6 @@
 
 A Sound Event Detection (SED) system targeting urban noises to monitor and improve the acoustic environment in Acacias. This project is a modern, pure PyTorch implementation of the `SB_CNN_SED` model (originally from the [DCASE-models](https://github.com/MTG/DCASE-models) repository), designed for production efficiency, deployability, and maintainability.
 
-## Project Status
-
-- **Phase 1 & 2 (Complete):** Data pipeline (Mel Spectrograms) and PyTorch architecture (`SBCNNSed`) perfectly matches the reference DCASE behavior.
-- **Phase 3 (Complete):** PyTorch training loop with Early Stopping and Weights & Biases (`wandb`) integration is completed.
-- **Current Phase:** Phase 4 (Formal Segment-Based Evaluation) & Phase 5 (Stakeholder Demo).
-
-*For a detailed breakdown of the roadmap and contract, see the `implementation_plan.md` in the workspace root.*
-
 ## Repository Structure
 
 ```text

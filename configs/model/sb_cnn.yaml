@@ -1,0 +1,2 @@
+_target_: sbcnn_sed.model.models.SBCNNSed
+num_classes: 10

@@ -1,0 +1,4 @@
+threshold: 0.3
+merge_gap_seconds: 1.0
+metric_type: segment_based
+report_dir: logs/reports
