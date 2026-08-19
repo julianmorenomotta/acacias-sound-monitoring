@@ -1,5 +1,4 @@
 import torch
-import pytest
 from sbcnn_sed.model.models import SBCNNSed
 
 
