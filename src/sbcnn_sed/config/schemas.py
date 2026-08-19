@@ -3,6 +3,8 @@ from pathlib import Path
 from enum import Enum
 from omegaconf import OmegaConf
 
+from sbcnn_sed.model.models import DEFAULT_CONV_BLOCKS, ConvBlockConfig
+
 
 class Fold(str, Enum):
     train = "train"
@@ -25,10 +27,18 @@ class WandBConfig:
 
 @dataclass
 class ModelConfig:
-    """Model architecture as data"""
+    """Model architecture as data (condumed by hydra.util.instantiate)"""
 
     _target_: str = "sbcnn_sed.model.models.SBCNNSed"
     num_classes: int = 10
+    in_channels: int = 1
+    input_shape: tuple[int, int] = (32, 64)
+    conv_blocks: list[ConvBlockConfig] = field(
+        default_factory=lambda: list(DEFAULT_CONV_BLOCKS)
+    )
+    fc_hidden: int = 64
+    dropout: float = 0.5
+    pool_size: int = 2
 
 
 @dataclass

@@ -8,12 +8,45 @@ Validates:
 
 """
 
+import torch
 import hydra
 import pytest
 from omegaconf import OmegaConf
 from omegaconf.errors import ConfigKeyError, ValidationError
 
+from sbcnn_sed.model.models import SBCNNSed
 from sbcnn_sed.config import AppConfig
+
+
+class Testinstantiate:
+    """hydra.util.instantiate(cfg.model) build a real, working model."""
+
+    def test_schema_instantiate_model(self):
+        cfg = OmegaConf.structured(AppConfig())
+        model = hydra.utils.instantiate(cfg.model)
+        assert isinstance(model, SBCNNSed)
+
+    def test_composed_config_instantiates_and_forward(self):
+        with hydra.initialize(config_path="../configs", version_base=None):
+            composed = hydra.compose(config_name="config")
+        model = hydra.utils.instantiate(composed.model)
+        x = torch.rand(1, 32, 64)
+        out = model(x)
+        assert out.shape == (1, composed.model.num_classes)
+
+    def test_parameter_count_matches_baseline(self):
+        """the config driven model is bit-identical in size to the original."""
+        cfg = OmegaConf.structured(AppConfig())
+        model = hydra.utils.instantiate(cfg.model)
+        total = sum(p.numel() for p in model.parameters())
+        assert total == 244_554
+
+    def test_architecture_is_parameterized(self):
+        """Changing conv_blocks in config changes the model — no code edit."""
+        cfg = OmegaConf.structured(AppConfig())
+        cfg.model.conv_blocks[0].out_channels = 32
+        model = hydra.utils.instantiate(cfg.model)
+        assert model.encoder[0][0].out_channels == 32
 
 
 class TestSchemaDefaults:
