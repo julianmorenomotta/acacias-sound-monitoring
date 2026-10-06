@@ -111,7 +111,7 @@ python scripts/train.py           # fresh run
 python scripts/train.py --resume  # resume from models/checkpoints/best_sed_model.pth
 ```
 
-Training uses `BCEWithLogitsLoss` + Adam, logs to Weights & Biases (entity `julianmrn5-brl-media`, project `acacias-sound-monitor`) and applies early stopping. The best checkpoint is saved to `models/checkpoints/best_sed_model.pth` whenever validation loss improves; a periodic checkpoint is written every 10 epochs.
+Training uses `BCEWithLogitsLoss` + Adam, logs to Weights & Biases and applies early stopping. The best checkpoint is saved to `models/checkpoints/best_sed_model.pth` whenever validation loss improves; a periodic checkpoint is written every 10 epochs.
 
 ### 4. Evaluate the Model
 
